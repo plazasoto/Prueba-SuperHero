@@ -4,25 +4,17 @@ $(function(){
     /* Funcion al hacer click en botón */
     $("#botonBuscar").click(function(event){
         event.preventDefault()
-                //console.log("(ᓀ‸ᓂ)Vanitas vanitatum et omnia vanitas");
-        console.log($("#inputNumero").val());
         validacionInput($("#inputNumero").val());
     });
 
     /* Validación de la consulta del usuario */
-    // Verificar que se ingrese solamente números
+    // Verificar que se ingrese solamente números dentro del rango válido.
     function validacionInput(input){
-        //expresionValidar = /^[1-9][0-9]*$/;//números enteros mayores a 0
-        //el número debe ser de 1 a 731 (valores de la api)
-        //      o podría dejar que ingresen valores más altos y manejar lo que devuelva la api...
-        //          (ᓀ‸ᓂ)
-        //if(expresionValidar.test(input)){
         let inputInt = parseInt(input);
         if(inputInt > 0 && inputInt <= 731){
             consulaAPI(input);
         }else{
-            //error
-            console.log("(ᓀ‸ᓂ)𝓥𝓪𝓷𝓲𝓽𝓪𝓼 𝓥𝓪𝓷𝓲𝓽𝓪𝓽𝓾𝓶 𝓮𝓽 𝓸𝓶𝓷𝓲𝓪 𝓥𝓪𝓷𝓲𝓽𝓪𝓼");
+            alert("Error: Debe ingresar un número de 1 a 731");
         }
     };
 
@@ -31,7 +23,7 @@ $(function(){
         return `<section class="card mb-3 col-6" style="max-width: 540px;">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img src="${image}" class="img-fluid rounded-start" alt="...">
+                            <img src="${image}" class="img-fluid rounded-start" alt="Imagen de ${nombre}">
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
@@ -49,7 +41,6 @@ $(function(){
                     </div>
                 </section>
                 <section class="col-6" id="pieChart">
-                    <!--<img src="./assets/img/sh2.jpg" alt="placeholder" style="width: 100%;">-->
                 </section>`;
     }
 
@@ -62,36 +53,39 @@ $(function(){
             dataType: "json",
             success: function(data){
                 console.log(data);
-                $("#resultado").empty();
-                //$("#resultado").append(`<p>${data.name}</p>`);
-                $("#resultado").append(textoResultado(
-                    data.image.url, 
-                    data.name,
-                    Object.values(data.connections)[0],
-                    data.biography.publisher,
-                    data.work.occupation,
-                    Object.values(data.biography)[4],
-                    data.appearance.height,
-                    data.appearance.weight,
-                    data.biography.aliases));
                 
-                /////////////Probando/////////
-                renderizarGrafico(imprimirDatos(data));
+                if(data.error){
+                    alert("id "+id+" no válida");
+                }
+                else{
+                    $("#resultado").empty();
+                    $("#resultado").append(textoResultado(
+                        data.image.url, 
+                        data.name,
+                        Object.values(data.connections)[0],
+                        data.biography.publisher,
+                        data.work.occupation,
+                        Object.values(data.biography)[4],
+                        data.appearance.height,
+                        data.appearance.weight,
+                        data.biography.aliases));
+                    renderizarGrafico(powerStats(data.powerstats), data.name);
+                }
             },
             error: function(error){
                 console.log("Error:");
                 console.log(error);
-
-                $("#resultado").append(`<p>---ERROR---</p>`);
+                alert("Error al consultar API");
+                //console.log("(ᓀ‸ᓂ)𝓥𝓪𝓷𝓲𝓽𝓪𝓼 𝓥𝓪𝓷𝓲𝓽𝓪𝓽𝓾𝓶 𝓮𝓽 𝓸𝓶𝓷𝓲𝓪 𝓥𝓪𝓷𝓲𝓽𝓪𝓼");
             }
         })
     };
 
     /* Para recorrer objeto */
+    // Podría recorrer todo el objeto para recolectar datos, limpiando un poco el código del bloque de
+    // texto a insertar, pero parece que no hacen falta todos esos datos.
+    /*
     function imprimirDatos(dato, dataPoints1 = []){
-        ////////////
-        //let dataPoints1 = [];
-        ///////////
         for(let entry of Object.entries(dato)){
             if(typeof entry[1] === 'object' && !Array.isArray(entry[1]) && entry[1] !== null){
                 //element.append(`<p>${entry[0]}:</p>`);
@@ -102,12 +96,16 @@ $(function(){
                 console.log(`${entry[0]}: ${entry[1]}`);
                 switch (entry[0]){
                     case "intelligence":
+                        // fall through
                     case "strength":
+                        // fall through
                     case "speed":
+                        // fall through
                     case "durability":
+                        // fall through
                     case "power":
+                        // fall through
                     case "combat":
-                        //console.log("En switch "+entry[0]);
                         dataPoints1.push({y: parseInt(entry[1]), indexLabel: entry[0]});
                         console.log(dataPoints1);
                         break;
@@ -122,12 +120,23 @@ $(function(){
         return dataPoints1;
         //////////////////////
     }
+    */
+   /* Recolectando datos para el gráfico mediante un for (ᓀ‸ᓂ)*/
+    function powerStats(dato){
+        let dataPoints1 = []
+        for(let entry of Object.entries(dato)){
+            dataPoints1.push({y: parseInt(entry[1]), indexLabel: entry[0]});
+            //console.log(dataPoints1);
+        }    
+        return dataPoints1;
+    }
 
-    function renderizarGrafico(datos){
+    /* Función que genera el gráfico CanvasJS. Pide nombre para ponerlo en el título. */
+    function renderizarGrafico(datos, nombre){
         let chart = new CanvasJS.Chart("pieChart",
             {
                 title: {
-                    text: "Estadísticas de Poder"
+                    text: "Estadísticas de Poder para "+nombre
                 },
                 legend: {
                     maxWidth: 350,
@@ -145,4 +154,5 @@ $(function(){
         chart.render();
     }
 
+    //consulaAPI(1000)
 });
