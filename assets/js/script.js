@@ -1,5 +1,5 @@
 $(function(){
-    console.log("(ᓀ‸ᓂ)");
+    console.log("(ᓀ‸ᓂ)");//Ver cuando esté cargado el script
 
     /* Funcion al hacer click en botón */
     $("#botonBuscar").click(function(event){
@@ -22,12 +22,12 @@ $(function(){
     function textoResultado(image, nombre, conexiones, publicacion, ocupacion, primera, altura, peso, alias){
         return `<section class="card mb-3 col-6" style="max-width: 540px;">
                     <div class="row g-0">
+                    <h5 class="card-title text-center"><b>SuperHero Encontrado</b></h5>
                         <div class="col-md-4">
-                            <img src="${image}" class="img-fluid rounded-start" alt="Imagen de ${nombre}">
+                            <img src="${image}" class="img-fluid rounded" alt="Imagen de ${nombre}">
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
-                                <h5 class="card-title">SuperHero Encontrado</h5>
                                 <p class="card-text">Nombre: ${nombre}</p>
                                 <p class="card-text">Conexiones: ${conexiones}</p>
                                 <p class="card-text">Publicado por: ${publicacion}</p>
@@ -76,7 +76,6 @@ $(function(){
                 console.log("Error:");
                 console.log(error);
                 alert("Error al consultar API");
-                //console.log("(ᓀ‸ᓂ)𝓥𝓪𝓷𝓲𝓽𝓪𝓼 𝓥𝓪𝓷𝓲𝓽𝓪𝓽𝓾𝓶 𝓮𝓽 𝓸𝓶𝓷𝓲𝓪 𝓥𝓪𝓷𝓲𝓽𝓪𝓼");
             }
         })
     };
